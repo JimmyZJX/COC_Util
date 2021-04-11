@@ -41,6 +41,7 @@ TH_pat9 = {0x393b42, "-3|-3|0xb99b83,-42|16|0x2c3139,-34|26|0x594d44,1|24|0x3c3f
 TH_pat10 = {0x9d3b33, "14|-16|0x8b786e,46|-6|0x816d6f,40|5|0xffe760,20|18|0x983a34,20|-4|0xffd760", 30, 50};
 TH_pat11 = {0xff843a, "0|6|0xffc143,-1|10|0xff9330,-1|26|0xcf3000,25|-3|0xf9f4f2,-34|6|0xc13e00", 0, 52};
 TH_pat12 = {0xfbdb6d, "9|-6|0xe1b43e,3|8|0x785410,7|19|0x111418,-36|-31|0x408ce0", -15, 35};
+TH_pat13 = {0xd0ffff, "10|-15|0x182029,-23|18|0xbbfaff,-23|26|0x96ccff,3|46|0x90c7ff,18|46|0xc0fcff,-3|30|0x293b45,5|9|0x8789e", 10, 50};
 
 
 function findAllPat(pat)
@@ -63,8 +64,8 @@ end
 local DED_pat67 = {0x9b8686, "1|11|0xa2724b,8|17|0xedbe57,14|13|0xdfa03f,14|20|0x96837f,31|38|0xe6b858", 0, 0}; -- ,24|6|0xfef777,6|12|0x6f5722
 local Elixir_pat13_60 = {0xb960d3, "3|-50|0x2a1d10,4|-46|0x614224,12|-25|0xe8b450,13|-4|0xfff878,12|12|0x805820,18|6|0x865b20,18|14|0x825620,7|14|0xfbb84f"};
 local Elixir_pat13_80 = {0x985ab0, "3|-50|0x2a1d10,4|-46|0x614224,12|-25|0xe8b450,13|-4|0xfff878,12|12|0x805820,18|6|0x865b20,18|14|0x825620,7|14|0xfbb84f"};
-local Elixir_pat12_80 = {0xb659cc, "0|-48|0x2b1e12,0|-43|0x5c4024,-6|14|0x6d5828,10|14|0x9e6c28,-5|-3|0xf8d060,9|-3|0xfff478"};
-local Elixir_pat12_60 = {0xffacff, "0|-48|0x2b1e12,0|-43|0x5c4024,-6|14|0x6d5828,10|14|0x9e6c28,-5|-3|0xf8d060,9|-3|0xfff478"};
+local Elixir_pat12_80 = {0xb659cc, "0|-48|0x2b1e12,0|-43|0x5c4024,-6|14|0x6d5828,10|14|0x9e6c28,-5|-3|0xf8d060,9|-3|0xfff478,5|40|0x683278"};
+local Elixir_pat12_60 = {0xffacff, "0|-48|0x2b1e12,0|-43|0x5c4024,-6|14|0x6d5828,10|14|0x9e6c28,-5|-3|0xf8d060,9|-3|0xfff478,5|40|0x79338c"};
 
 function hasAny60Elixir()
 	local has60 = false;
@@ -99,8 +100,6 @@ function hasAny60Elixir()
 	return has60;
 end
 
-hasAny60Elixir();
-
 function hasAny60DE()
 	local has60 = false;
 
@@ -113,12 +112,17 @@ function hasAny60DE()
 		local desc = "";
 		if isColor(p.x - 8, p.y + 7, 0x7d7172, 80) then
 			desc = "0"
-		elseif isColor(p.x - 1, p.y + 8, 0x695870, 90) then
+		elseif isColor(p.x - 1, p.y + 8, 0x695870, 93) then
 			desc = "20+"
 		elseif isColor(p.x - 1, p.y + 6, 0x685169, 90) or isColor(p.x - 1, p.y + 5, 0x685169, 90) then
 			desc = "40+"
 		else
-			desc = "60+"; has60 = true;
+			local r,g,b = getColorRGB(p.x - 1, p.y + 5);
+			if r + g + b < 200 then
+				desc = "60+"; has60 = true;
+			else
+				desc = "0";
+			end
 		end
 
 		fwShowButton("wndDEResult", "btnResultDE" .. i, "DE67:" .. desc, "FFFFFF", "FF0000", "", 12, p.x, p.y, p.x+150, p.y+30);
@@ -132,6 +136,7 @@ function findTH()
 	local TH_lvl, x, y;
 	keepScreen(true);
 	for i = 1, 1 do
+		x, y = findTHPat(TH_pat13); if x >= 0 and y >= 0 then TH_lvl = 13; break; end
 		x, y = findTHPat(TH_pat12); if x >= 0 and y >= 0 then TH_lvl = 12; break; end
 		x, y = findTHPat(TH_pat11); if x >= 0 and y >= 0 then TH_lvl = 11; break; end
 		x, y = findTHPat(TH_pat10); if x >= 0 and y >= 0 then TH_lvl = 10; break; end
@@ -164,6 +169,11 @@ function closeFloatTH()
 end
 
 --[[
+while true do
+	hasAny60Elixir()
+end--]]
+
+--[[ TH test
 while true do
 	local TH_lvl, x, y = findTH();
 	if TH_lvl ~= nil then
@@ -264,8 +274,8 @@ local InitDefaults = {
 	{ name = 'G+E 80w', mode = SearchModes['G+E'], value = 80 },
 	{ name = 'G+E 100w', mode = SearchModes['G+E'], value = 100 },
 	{ name = 'G 60w', mode = SearchModes['G'], value = 60 },
-	{ name = 'DE 2000', mode = SearchModes['DE'], value = 2000 },
 	{ name = 'DE 4000', mode = SearchModes['DE'], value = 4000 },
+	{ name = 'DE 6000', mode = SearchModes['DE'], value = 6000 },
 };
 
 local txtReduce = "100%";
@@ -501,7 +511,8 @@ while true do
 			tapNext();
 			mSleep(simpleGaussian(500, 1000));
 		else
-			ShowInfoText("[Searching] " .. _search_i);
+			local battery = batteryStatus();
+			ShowInfoText("[Searching] " .. _search_i .. " 电量" .. tostring(battery.level));
 			mSleep(simpleGaussian(200, 2000));
 		end
 		
@@ -509,6 +520,8 @@ while true do
 
 	setVolumeLevel(0.25); mSleep(300);
 	playAudio("archer_queen_deploy_01.mp3");
+	mSleep(2000); 
+	setVolumeLevel(0);
 	
 	WaitInfoReset();
 end
